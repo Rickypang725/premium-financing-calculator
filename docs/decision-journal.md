@@ -58,4 +58,3 @@
 - 發生：sandbox 建立嘅 .gitignore 冇跟住 repo 轉移去本機，本地版本只有 .DS_Store
 - 後果：egg-info 同 __pycache__ 被追蹤，git status 混濁
 - 對策：重建 repo 時檢查清單加一項「逐個檔案核對 sandbox 與本機一致」
-- 面試可用度：★★☆（如實講係失誤，重點係發現同修正嘅流程）
