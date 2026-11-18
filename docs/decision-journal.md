@@ -36,3 +36,25 @@
 2. 如果重來一次會跳過什麼？
 3. 這一步的證據在哪？（commit 連結 / CI 截圖）
 -->
+## 2026-11-12 — M0 IRR 求解器選擇
+- 抉擇：Newton-Raphson（規格建議）vs 掃描+二分法
+- 選了：掃描+二分法——Newton 在 year-5 case 第一步 r=0→2.77 發散溢出
+- 為什麼：前期虧損型現金流的 NPV 曲線（圖形上）在初值附近過陡（太過敏銳）；規格 §2 允許任何正確求解器
+- 代價/省下：求解器不優雅，但收斂有保證，而且專案的表現有保證，能夠很好的提供搜索區間，免除了最大壞處；日後可加分段 Newton 提速
+
+## 2026-11-14 — M0 累計利息語義
+- 抉擇：累計利息按表格列累加 vs 按日曆年累加
+- 選了：日曆年——表格缺列年份利息照樣產生（year-20 差 8 年年息被 golden test 抓住）
+
+## 2026-11-15 — M1 httpx → httpx2 遷移
+- 抉擇：跟唔跟 Starlette 嘅 deprecation warning 轉 httpx2
+- 選了：轉——httpx stable line 停滯 21 個月，冇安全修補路徑；httpx2 由 Pydantic Services＋原作者維護，FastAPI/OpenAI SDK 已遷移
+- 為什麼：供應鏈維護性係預防式資安，唔等到 CVE 先郁
+- 代價/省下：改一行依賴；pytest 加 deprecation-as-error 防回退
+- 注意：★★★（supply-chain hygiene、deprecation 監控策略）
+
+## 2026-11-15 — 流程漏洞：.gitignore 冇喺重建時轉移
+- 抉擇：無——係事後發現
+- 發生：sandbox 建立嘅 .gitignore 冇跟住 repo 轉移去本機，本地版本只有 .DS_Store
+- 後果：egg-info 同 __pycache__ 被追蹤，git status 混濁
+- 對策：重建 repo 時檢查清單加一項「逐個檔案核對 sandbox 與本機一致」
