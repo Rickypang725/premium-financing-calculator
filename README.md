@@ -19,8 +19,9 @@ An earlier rebuild implemented first and verified later, which left no objective
 |---|---|
 | M0 | Calculation engine (`src/pfpro/engine.py`) — stdlib only, pure functions |
 | M1 | REST API (FastAPI) over the engine |
-| M2 | Docker + Terraform → Cloud Run |
-| M3 | GitHub Actions CI/CD |
+| M2a| Docker（multi-stage、非 root）|
+| M2b| Terraform → AWS ECS Fargate（ADR-8，運行於 cloud-lab VPC）|
+| M3| GitHub Actions CI/CD（OIDC → ECR → ECS）|
 | M4 | React frontend (API-only, no embedded calculation) |
 
 Milestone details and acceptance criteria: `docs/03-roadmap.md`.

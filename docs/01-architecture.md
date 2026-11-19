@@ -18,7 +18,6 @@
 
 ## ADR-3 部署目標：GCP Cloud Run（region: asia-east2 香港）
 
-**[採用]** 容器化（Docker）後由 Terraform 部署到 Cloud Run；region 選 asia-east2（延遲 + 資料落地考量）。
 **[已被 ADR-8 取代（2026-11-19）；以下為原始決策，保留作為決策痕跡]**
 
 - **理由**：Cloud Run = 請求導向、scale-to-zero，無閒置成本，正對目標職缺（Junior Cloud Engineer, GCP-first）的技術面；Terraform 管理全部資源，符合 IaC 紀律，可寫進 CV：`Terraform-managed Cloud Run service`。

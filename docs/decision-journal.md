@@ -58,3 +58,23 @@
 - 發生：sandbox 建立嘅 .gitignore 冇跟住 repo 轉移去本機，本地版本只有 .DS_Store
 - 後果：egg-info 同 __pycache__ 被追蹤，git status 混濁
 - 對策：重建 repo 時檢查清單加一項「逐個檔案核對 sandbox 與本機一致」
+
+## 2026-11-19 — M2 部署平台 pivot（對應 ADR-8）
+- 抉擇：M2 部署平台維持 GCP Cloud Run 還是轉向 AWS ECS Fargate
+- 選了：AWS ECS Fargate（ap-east-1），Cloud Run 降級為 M5 多雲對比候選
+- 為什麼：策略由「崗位針對性（GCP-first）」改為「香港雲端市場整體需求」——香港金融業 AWS 為主力、多雲是常態要求；且 GCP 帳號未開通，Cloud Run 路線驗收只能停在 plan，產生不了可 curl 的證據；cloud-lab 地基現成
+- 代價/省下：ADR-3 前提作廢、M2/M3 改寫（約 1h 文件工）；換取端到端可驗證證據＋雙 repo 協同敘事
+- 面試可用度：★★★（pivot 的決策框架：證據鏈完整性 &gt; 單一平台熟練度；sunk cost 與前提失效的辨識）
+
+## 2026-11-19 — 雙 repo 邊界劃分
+- 抉擇：Repo 2 如何引用 cloud-lab 的網路資源（remote state vs data source）
+- 選了：Terraform data source 依 tag 查詢
+- 為什麼：鬆耦合——Repo 1 內部 refactor 不影響 Repo 2；remote state 需互相開放 state 權限且輸出改名即打斷 plan
+- 代價/省下：data source 無法強制「資源必定存在」，靠驗收條件與文件約定補
+- 面試可用度：★★★（耦合度權衡、跨團隊 infra 協作模式）
+
+## 2026-11-19 — 熔斷機制重新定義（待拍板）
+- 抉擇：ADR-7 的 11-23 deadline 與 10h 上限在 pivot 後如何處理
+- 選了：建議 11-23 重新定義為「M2a 完成＋求職投遞就緒」，M2b 起列第二期另設預算
+- 為什麼：deadline 由求職節奏決定，不是工作量；M2b 卡在 Repo 1 M1 前置，硬守原 deadline 只會兩邊都半成品
+- 面試可用度：★★☆（scope vs deadline、檢查點設計）
