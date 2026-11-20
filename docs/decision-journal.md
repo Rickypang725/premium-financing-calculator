@@ -73,8 +73,26 @@
 - 代價/省下：data source 無法強制「資源必定存在」，靠驗收條件與文件約定補
 - 面試可用度：★★★（耦合度權衡、跨團隊 infra 協作模式）
 
-## 2026-11-19 — 熔斷機制重新定義（待拍板）
+## 2026-11-19 — 熔斷機制重新定義（已拍板）
 - 抉擇：ADR-7 的 11-23 deadline 與 10h 上限在 pivot 後如何處理
 - 選了：建議 11-23 重新定義為「M2a 完成＋求職投遞就緒」，M2b 起列第二期另設預算
 - 為什麼：deadline 由求職節奏決定，不是工作量；M2b 卡在 Repo 1 M1 前置，硬守原 deadline 只會兩邊都半成品
 - 面試可用度：★★☆（scope vs deadline、檢查點設計）
+
+## 2026-11-19 — M2a 完成回顧（containerize）
+1. 當初的假設哪個錯了？（自己填——例如對 Docker layer caching 或映像檔大小的預期）
+2. 重來一次會跳過什麼？（自己填）
+3. 證據在哪：merge commit da6e889；驗收輸出（docker build OK / /healthz 200 / id -u ≠ 0 / year-7 projection 對 golden vectors bit-for-bit）；tag m2a-complete
+
+## 2026-11-19 — 流程教訓：雙軌提交＋branch 切點偏差（reflog 還原）
+- 抉擇：無——事後用 git reflog 還原操作序列時發現
+- 發生：(1) docs branch 從未合併的 feature commit（4749069）切出，而非 main；(2) 同一份 stage-0 編輯直接 commit 到 main（103b49a）、又複製到 branch（d17f2e4）
+- 後果：merge 時 01-architecture.md 衝突；main 側編輯 A 變「插入」、殘留語義矛盾的舊狀態行；解法用 git checkout --theirs 取 branch 側
+- 對策：branch 一律 `git switch -c &lt;name&gt; main` 切點寫死＋切完 `git log main..HEAD --oneline` 自檢為空；所有變更（含純文件）一律走 branch，main 只接受 merge
+- 面試可用度：★★★（root cause 分析、reflog 還原、branch=commit 上的標籤這個資料模型）
+
+## 2026-11-19 — commit message typo（EC2→ECS Fargate）的處置
+- 抉擇：兩筆 commit message 誤寫 EC2 Fargate，改寫歷史還是留痕？
+- 判斷標準：是否已推送。已推送的 da6e889 不動（force-push 的解釋成本高於 typo，且與「未修飾證據鏈」的定位矛盾）；未推送的 d17f2e4 用 rebase --rebase-merges + reword 修正
+- 插曲：自動化 one-liner 因 macOS BSD sed `-i` 須接備份副檔名而失敗（GNU sed 可裸用）；第一輪 reword 未生效；第二輪互動式成功，且學到 HEAD~1=第一 parent、HEAD^2=第二 parent（merge commit 導航）
+- 面試可用度：★★★（已發布/未發布歷史的處置框架、GNU/BSD userland 差異、~ 與 ^ 語義）
